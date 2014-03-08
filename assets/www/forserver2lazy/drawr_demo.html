@@ -1,0 +1,68 @@
+<input type="button" value="add obj" onClick="add_one();" /> | 
+<input type="button" value="update" onClick="update();" />
+
+<br/>
+
+<canvas id="game" style="border:1px solid black;">
+    pls upgrade broswer 2 play vidoe game
+</canvas>
+<div id="debug" style="overflow-y:scroll;">&nbsp;</div>
+
+
+<script type="text/javascript" src="utils.js"></script>
+<script type="text/javascript" src="drawobject.js"></script>
+<script type="text/javascript" src="network.js"></script>
+<script type="text/javascript" src="web_drawr.js"></script>
+
+<script type="text/javascript">
+    var newest_id = -1;
+
+    function makeobjo(){
+        r = function(){ return Math.floor(Math.random()*10 - 5); }
+        objo = new DrawrPath();
+        objo.addPoint(25+r(),25+r(),100,100);
+        objo.addPoint(34+r(),30+r(),100,100);
+        objo.addPoint(87+r(),54+r(),100,100);
+        objo.addPoint(10+r(),54+r(),100,100);
+        objo.addPoint(90+r(),78+r(),100,100);
+        return objo.serialize();
+    }
+    
+    function add_one(){
+        url_post = "http://127.0.0.1:27182/post?mainroom&" + makeobjo();
+        loadJSON(url_post, function(jsonObj){
+            newest_id = 1 * jsonObj;
+            debug.innerHTML += "id: " + newest_id + ",";
+        });
+    }
+    
+    function update(){
+        loadJSON("http://127.0.0.1:27182/get?mainroom&-1", function(jsonObj){
+            debug.innerHTML = JSON.stringify(jsonObj);
+            
+            // since requesting from -1
+            drawrObjects = [];
+            for(var i=0; i<jsonObj.length; ++i){
+                drawrObjects.push(DrawrPath.fromJSON(jsonObj[i]));
+            }
+            
+            /*if(jsonObj.length > 0){
+                drawrObjects.push(DrawrPath.fromJSON(jsonObj[0]));
+            }*/
+            // NEED TO GET NEWEST ID FROM THIS ??!?!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! YES so we don't ke
+            //ep refreshing every object since the last one we posted, fug
+        });
+    }
+
+    function doit(){
+        /*var pony = ""
+        var count = 0
+        for(var i=0;i<6;++i){
+            loadJSON("http://127.0.0.1:27182/check?", function(jsonObj){
+                pony += jsonObj+"\n";
+                count++;
+                if(count == 4) alert(pony);
+            });
+        }*/
+    }
+</script>
