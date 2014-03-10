@@ -3,6 +3,7 @@ import socketserver
 import socket
 import re
 import time
+import urllib.parse
 
 host = "127.0.0.1"
 port = 27182 # 80
@@ -95,6 +96,7 @@ class DrawrHandler(socketserver.StreamRequestHandler):
             if not match: self.send_error(404, "Invalid Request")
             room = post_match.group(1)
             json_str = post_match.group(2)
+            print("POST: " + urllib.parse.unquote(json_str))
             response = DrawrRoomsHolder.post(room, json_str)
             self.send_response(response)
             
@@ -111,6 +113,7 @@ class DrawrHandler(socketserver.StreamRequestHandler):
             room = post_match.group(1)
             after_id = post_match.group(2)
             response = DrawrRoomsHolder.get(room, after_id)
+            print("GET: " + urllib.parse.unquote(response))
             self.send_response(response)
             
         elif match.group(1) == 'clear':
