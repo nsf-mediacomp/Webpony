@@ -19,7 +19,7 @@ class DrawrRoom():
 
     def post(self,json_str):
         #this is a race condition isn't it?
-        #it shouldn't ever cause a crash, and is minor
+        #should only result in a minor graphical bug, if so
         self.objects.append(json_str)
         return str(len(self.objects) - 1)
 
@@ -30,6 +30,10 @@ class DrawrRoom():
         # slice the array, then format it as a json list
         after_id = int(after_id)
         return "[" + ",".join(self.objects[after_id+1:]) + "]"
+
+    def clear(self):
+        self.objects = []
+        return "0"
 
 class DrawrRoomsHolder():
     rooms = {}
@@ -49,6 +53,10 @@ class DrawrRoomsHolder():
             DrawrRoomsHolder.rooms[room] = DrawrRoom()
         return DrawrRoomsHolder.rooms[room].get(after_id)
 
+    def clear(room):
+        if room not in DrawrRoomsHolder.rooms:
+            DrawrRoomsHolder.rooms[room] = DrawrRoom()
+        return DrawrRoomsHolder.rooms[room].clear()
 
 def strip_path(p):
     p = re.sub(r'^http:\/\/','',p)
@@ -59,7 +67,6 @@ class DrawrHandler(socketserver.StreamRequestHandler):
 
     """
     Instantiated once per connection to the server.
-    Override handle() to handle client connections.
     """
 
     def route(self):
@@ -72,8 +79,8 @@ class DrawrHandler(socketserver.StreamRequestHandler):
         # /get?r&room&updates_after_this_id
         #    - replies with JSON list of new objects from all client
         #      that are not the requesting client
-
-        ## TODO: add /clear?r&room
+        # add /clear?r&room
+        #    - returns 0
 
         parse_path_str = self.path
         parse_path_str = re.sub(r'^https?:\/\/[^\/]*', '', parse_path_str)
@@ -104,6 +111,13 @@ class DrawrHandler(socketserver.StreamRequestHandler):
             room = post_match.group(1)
             after_id = post_match.group(2)
             response = DrawrRoomsHolder.get(room, after_id)
+            self.send_response(response)
+            
+        elif match.group(1) == 'clear':
+            post_match = re.match(r'^[^&]+&(.*)$', match.group(2))
+            if not match: self.send_error(404, "Invalid Request")
+            room = post_match.group(1)
+            response = DrawrRoomsHolder.clear(room)
             self.send_response(response)
 
         else:

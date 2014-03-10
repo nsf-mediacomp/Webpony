@@ -43,7 +43,7 @@ function update(){
     count++;
     fps_counter++;
     var nowTime = now();
-    debug.innerHTML = fps.toFixed(1) + " fps | " + mousex + ", " + mousey;
+    //debug.innerHTML = fps.toFixed(1) + " fps | " + mousex + ", " + mousey;
     if(nowTime - fpsLastUpdate > 1000){
         fps = fps_counter;
         fpsLastUpdate = nowTime;
@@ -52,7 +52,7 @@ function update(){
     ctx.fillStyle = "rgb(255,255,255)";
     ctx.fillRect(0,0,stage.width,stage.height);
     
-    fillCircle(ctx, "blue", 100+50*Math.cos(count/180*Math.PI), 100+50*Math.sin(count/180*Math.PI), 30);
+    //fillCircle(ctx, "blue", 100+50*Math.cos(count/180*Math.PI), 100+50*Math.sin(count/180*Math.PI), 30);
     
     // DRAWR CODE
     // OPTIMIZE THIS. have it draw to a bitmap, and then just print that, then update the bitmap on changes to drawrObjects
@@ -60,7 +60,12 @@ function update(){
         drawrObjects[i].draw(ctx, stage.width, stage.height);
     }
     
-    if(mousedown){
+    // draw what user is drawing now
+    if(tempDrawrObject){
+        tempDrawrObject.draw(ctx, stage.width, stage.height, "blue");
+    }
+    
+    /*if(mousedown){
         fillCircle(ctx, "red", mousex, mousey, 25);
         var lx = mouselastx, ly = mouselasty;
         var dx = mousex - lx, dy = mousey - ly;
@@ -70,7 +75,7 @@ function update(){
         drawLine(ctx, "white", lx-10, ly+10, lx+10, ly-10, 5);
         drawLine(ctx, "black", lx-10, ly-10, lx+10, ly+10, 3);
         drawLine(ctx, "black", lx-10, ly+10, lx+10, ly-10, 3);
-    }
+    }*/
 
     updatelock = false; // let a new update() run
 }
@@ -102,7 +107,9 @@ function mousemoveEvent(e){
     mousey = getMouseY(e);
     
     // DRAWR CODE
-    tempDrawrObject.addPoint(mousex,mousey,stage.width,stage.height);
+    if(tempDrawrObject){
+        tempDrawrObject.addPoint(mousex,mousey,stage.width,stage.height);
+    }
     
     e.preventDefault(); //prevent mouse drag from trying to drag webpage
 }
@@ -118,6 +125,15 @@ function mousedownEvent(e){
     
     e.preventDefault(); //prevent mouse drag from trying to drag webpage
 }
+    
+    ///////// CODE THAT DOESNT BELONG HERE
+    function post_drawr_object(drawr_obj){
+        url_post = get_server() + "/post?" + get_room() + "&" + drawr_obj.serialize();
+        loadJSON(url_post, function(jsonObj){
+            newest_id = 1 * jsonObj;
+            debug.innerHTML += "id: " + newest_id + ",";
+        });
+    }
 
 function mouseupEvent(e){
     mousedown = false;
@@ -131,6 +147,7 @@ function mouseupEvent(e){
     // DRAWR CODE
     tempDrawrObject.addPoint(mousex,mousey,stage.width,stage.height);
     drawrObjects.push(tempDrawrObject);
+    post_drawr_object(tempDrawrObject);
     tempDrawrObject = 0;
     
     

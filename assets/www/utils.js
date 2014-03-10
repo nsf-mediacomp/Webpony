@@ -1,4 +1,6 @@
 
+/*** drawobject.js V1.0 ***/
+
 function drawCircle(ctx,color,x,y,r){
     ctx.strokeStyle = color;
     ctx.beginPath();

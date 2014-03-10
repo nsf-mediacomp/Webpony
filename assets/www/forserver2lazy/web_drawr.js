@@ -42,8 +42,6 @@ function update(){
     ctx.fillStyle = "rgb(255,255,255)";
     ctx.fillRect(0,0,stage.width,stage.height);
     
-    fillCircle(ctx, "blue", 100+50*Math.cos(count/180*Math.PI), 100+50*Math.sin(count/180*Math.PI), 30);
-    
     // DRAWR CODE
     // OPTIMIZE THIS. have it draw to a bitmap, and then just print that, then update the bitmap on changes to drawrObjects
     for(var i=0; i<drawrObjects.length; ++i){

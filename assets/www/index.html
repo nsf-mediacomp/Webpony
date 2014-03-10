@@ -1,18 +1,73 @@
-<input type="button" value="hello" onClick="showAndroidToast('Welceom 2 DRAWR!');" /> | 
-<input type="button" value="clear" onClick="clearScreen();" />
+<center>
+<!--input type="button" value="hello" onClick="showAndroidToast('Welcome 2 DRAWR!');" / -->
+<input type="button" value="update: on" id="toggle_update" onClick="toggle_update();" /> | 
+<input type="button" value="update" onClick="update();" /> | 
+<input type="button" value="clear" onClick="clear_drawr();" />
+<br/>
+Drawr Server: <input type="text" id="server_url" value="http://127.0.0.1:27182"/>
+<br/>
+Room: <input type="text" id="room" value="testroom"/>
 
 <br/>
 
 <canvas id="game" style="border:1px solid black;">
-    pls upgrade broswer 2 play vidoe game
+    pls upgrade broswer
 </canvas>
 <div id="debug" style="overflow-y:scroll;">&nbsp;</div>
+</center>
 
 <script type="text/javascript">
     function showAndroidToast(toast) {
         Android.showToast(toast);
     }
+    
+    function get_server(){
+        server = document.getElementById("server_url").value;
+        if(!server.match(/^http:\/\//)) server = "http://" + server;
+        document.getElementById("server_url").value = server;
+        return server;
+    }
+    
+    function get_room(){
+        return document.getElementById("server_url").value.replace(/\&/, "");
+    }
 </script>
 <script type="text/javascript" src="utils.js"></script>
 <script type="text/javascript" src="drawobject.js"></script>
+<script type="text/javascript" src="network.js"></script>
 <script type="text/javascript" src="drawr.js"></script>
+
+<script type="text/javascript">
+    var newest_id = -1;
+    
+    var do_updatingu = 1;
+    function toggle_update(){
+        do_updatingu = !do_updatingu;
+        document.getElementById("toggle_update").value = "update: " + (do_updatingu ? "on" : "off");
+    }
+    
+    function update(){
+        if(!do_updatingu) return;
+        loadJSON(get_server() + "/get?" + get_room() + "&-1", function(jsonObj){
+            debug.innerHTML = JSON.stringify(jsonObj);
+            
+            // since requesting from -1
+            drawrObjects = [];
+            for(var i=0; i<jsonObj.length; ++i){
+                drawrObjects.push(DrawrPath.fromJSON(jsonObj[i]));
+            }
+        });
+    }
+    
+    function clear_drawr(){
+        url_post = get_server() + "/clear?" + get_room();
+        loadJSON(url_post, function(jsonObj){
+            if(jsonObj*1 == 0){
+                drawrObjects = [];
+                debug.innerHTML = "";
+            }
+        });
+    }
+    
+    //////////////////////////////////////////setInterval(update, 500);
+</script>
