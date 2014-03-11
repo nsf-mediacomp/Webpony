@@ -5,7 +5,7 @@ import re
 import time
 import urllib.parse
 
-host = "127.0.0.1"
+host = "" #127.0.0.1
 port = 27182 # 80
 
 # adapted from http://hg.python.org/cpython/file/3.3/Lib/http/server.py
@@ -85,7 +85,7 @@ class DrawrHandler(socketserver.StreamRequestHandler):
 
         parse_path_str = self.path
         parse_path_str = re.sub(r'^https?:\/\/[^\/]*', '', parse_path_str)
-        parse_path_str = re.sub(r'^\/', '', parse_path_str)
+        parse_path_str = re.sub(r'^\/+', '', parse_path_str)
 
         match = re.match(r'([a-z]+)\?(.*)$', parse_path_str)
         if not match:

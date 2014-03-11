@@ -39,12 +39,12 @@ Room: <input type="text" id="room" value="testroom"/>
     function get_server(){
         server = document.getElementById("server_url").value;
         if(!server.match(/^http:\/\//)) server = "http://" + server;
-        document.getElementById("server_url").value = server;
+        //document.getElementById("server_url").value = server;
         return server;
     }
     
     function get_room(){
-        return document.getElementById("server_url").value.replace(/&/, "");
+        return document.getElementById("room").value.replace(/&/, "");
     }
     
     function add_one(){
@@ -61,8 +61,11 @@ Room: <input type="text" id="room" value="testroom"/>
         document.getElementById("toggle_update").value = "update: " + (do_updatingu ? "on" : "off");
     }
     
+    var update_lock = 0;
     function update(){
         if(!do_updatingu) return;
+        if(update_lock) return;
+        update_lock = 1;
         loadJSON(get_server() + "/get?" + get_room() + "&-1", function(jsonObj){
             debug.innerHTML = JSON.stringify(jsonObj);
             
@@ -78,6 +81,7 @@ Room: <input type="text" id="room" value="testroom"/>
             // NEED TO GET NEWEST ID FROM THIS ??!?!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! YES so we don't ke
             //ep refreshing every object since the last one we posted, fug
         });
+        update_lock = 0;
     }
     
     function clear_drawr(){
