@@ -107,7 +107,7 @@ function mousemoveEvent(e){
     mousey = getMouseY(e);
     
     // DRAWR CODE
-    if(tempDrawrObject){
+    if(tempDrawrObject && mousex && mousey){
         tempDrawrObject.addPoint(mousex,mousey,stage.width,stage.height);
     }
     
@@ -121,7 +121,7 @@ function mousedownEvent(e){
     
     // DRAWR CODE
     tempDrawrObject = new DrawrPath([],[]);
-    tempDrawrObject.addPoint(mouselastx,mouselasty,stage.width,stage.height);
+    //tempDrawrObject.addPoint(mouselastx,mouselasty,stage.width,stage.height);
     
     e.preventDefault(); //prevent mouse drag from trying to drag webpage
 }
@@ -145,7 +145,7 @@ function mouseupEvent(e){
     var mousedy = (mousey - mouselasty) / 4 / 3;
     
     // DRAWR CODE
-    tempDrawrObject.addPoint(mousex,mousey,stage.width,stage.height);
+    //tempDrawrObject.addPoint(mousex,mousey,stage.width,stage.height);
     drawrObjects.push(tempDrawrObject);
     post_drawr_object(tempDrawrObject);
     tempDrawrObject = 0;
